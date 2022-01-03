@@ -67,6 +67,9 @@ const main = async () => {
   // connect to mongo
   const mongoDBUrl = `mongodb+srv://${process.env.SESSION_DB_USER_DEV_PROD}:${process.env.SESSION_DB_PASS_DEV_PROD}@beematie.hyxqo.mongodb.net/beematie?retryWrites=true&w=majority`;
   await mongoose.connect(mongoDBUrl);
+
+  app.set('trust proxy', 1)
+
   // session middleware
   app.use(session({
     name: COOKIE_NAME,
@@ -75,8 +78,7 @@ const main = async () => {
       maxAge: 60 * 60 * 1000*24, // 1 day in milliseconds
       httpOnly: true, // only send cookie over http
       secure: __prod__ || false, // cookie only works in https
-      sameSite: 'lax',  // csrf
-      domain: __prod__ ? '.vercel.app' : undefined
+      sameSite: 'none',  // csrf
     },
     secret: process.env.SESSION_SECRET_DEV_PROD as string || "asdfasdfasdf",
     saveUninitialized: false, // don't create session until something stored
