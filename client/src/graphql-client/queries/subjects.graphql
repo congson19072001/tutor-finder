@@ -1,0 +1,10 @@
+query GetSubjects($limit: Int!, $cursor: String){
+	getSubjects(limit: $limit, cursor: $cursor) {
+    totalCount
+    cursor
+    hasMore
+    paginatedSubjects {
+      ...subjectInfo
+    }
+  }
+}

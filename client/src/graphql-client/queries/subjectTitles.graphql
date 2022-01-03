@@ -1,0 +1,8 @@
+query SubjectTitles($limit: Int!, $cursor: String){
+	getSubjects(limit: $limit, cursor: $cursor) {
+    paginatedSubjects {
+      title
+      textSnippet
+    }
+  }
+}

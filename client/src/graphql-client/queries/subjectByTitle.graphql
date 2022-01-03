@@ -1,0 +1,8 @@
+query GetSubjectByTitle( $title: String! ) {
+  getSubjectByTitle(
+    title : $title
+  )
+  {
+    ...subjectInfoWithTutors
+  }
+}

@@ -1,0 +1,17 @@
+mutation CreateSubject(
+    $createSubjectInput: CreateSubjectInput!
+  ){
+  createSubject(
+    createSubjectInput: $createSubjectInput
+  ){
+    code
+    success
+    message
+    subject{
+      id
+      title
+      description
+      createdAt
+    }
+  }
+}

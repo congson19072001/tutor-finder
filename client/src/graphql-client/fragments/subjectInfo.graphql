@@ -1,0 +1,7 @@
+fragment subjectInfo on Subject {
+    id
+    title
+    textSnippet
+    description
+    numberOfTutors
+}

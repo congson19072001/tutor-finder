@@ -1,0 +1,9 @@
+fragment subjectMutationResponse on SubjectMutationResponse {
+	...subjectMutationStatuses
+    subject {
+        ...subjectInfo
+    }
+    errors {
+        ...fieldError
+    }
+}

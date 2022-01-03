@@ -1,0 +1,5 @@
+mutation ConnectSubjectToTutor($subjectId : ID!) {
+  connectSubjectToTutor(subjectId: $subjectId) {
+    ...subjectMutationResponse
+  }
+}
