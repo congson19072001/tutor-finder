@@ -1,4 +1,4 @@
-# An interesting web app for tutors and learners to finding others
+# An interesting web app for tutors and learners to finding each other
 ## This app build on NextJS, GraphQL and expressJS
     If you are interested in other technologies in this project, here they are:
     - TypeScript
