@@ -1,19 +1,11 @@
 import { RegisterInput } from "../types/RegisterInput";
 
 export const validateRegisterInput = (registerInput: RegisterInput) => {
-    if(registerInput.lastName === "") {
+    if(registerInput.fullName === "") {
         return [
             {
-                field: 'lastName',
-                message: 'Last name is required'
-            }
-        ]
-    }
-    if(registerInput.firstName === "") {
-        return [
-            {
-                field: 'firstName',
-                message: 'First name is required'
+                field: 'fullName',
+                message: 'Full name is required'
             }
         ]
     }

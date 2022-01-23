@@ -1,5 +1,7 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Schedule } from "./Schedule";
+import { UserProfile } from "./UserProfile";
 
 
 @ObjectType()
@@ -23,17 +25,21 @@ export class User extends BaseEntity {
 
     @Field(_type=>String)
     @Column()
-    firstName!: string;
-
-    @Field(_type=>String)
-    @Column()
-    lastName!: string;
+    fullName!: string;
 
     @Field()
-    @CreateDateColumn()
+    @OneToOne(() => UserProfile, { cascade: true })
+    @JoinColumn()
+    profile: UserProfile;
+
+    @Field(_type => [Schedule], { nullable: true })
+    schedules: Schedule[];
+
+    @Field()
+    @CreateDateColumn({type: 'timestamptz'})
     createdAt: Date;
 
     @Field()
-    @UpdateDateColumn()
+    @UpdateDateColumn({type: 'timestamptz'})
     updatedAt: Date;
 }

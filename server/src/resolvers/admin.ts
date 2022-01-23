@@ -39,7 +39,7 @@ export class AdminResolver {
             }
         }
         try{
-            const {username, email, password, firstName, lastName} = registerInput;
+            const {username, email, password, fullName} = registerInput;
             const existingAdmin = await Admin.findOne({where: [{email}, {username}]});
             if (existingAdmin) {
                 return {
@@ -59,8 +59,7 @@ export class AdminResolver {
                 email,
                 username,
                 password: hashedPassword,
-                firstName,
-                lastName
+                fullName
             });
             await newAdmin.save();
             ctx.req.session.adminId = newAdmin.id;

@@ -8,7 +8,7 @@ import { Subject } from './entities/Subject';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { HelloResolver } from './resolvers/hello';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageProductionDefault } from 'apollo-server-core';
 import { UserResolver } from './resolvers/user';
 import mongoose from 'mongoose';
 import MongoStore from 'connect-mongo';
@@ -23,6 +23,8 @@ import { Admin } from './entities/Admin';
 import { AdminResolver } from './resolvers/admin';
 import { buildDataLoaders } from './utils/dataLoaders';
 import path from 'path';
+import { UserProfile } from './entities/UserProfile';
+import { TutorProfile } from './entities/TutorProfile';
 
 const main = async () => {
   const connection = await createConnection({
@@ -32,7 +34,7 @@ const main = async () => {
         url: process.env.DATABASE_URL,
       }
       : {
-      database: 'Beematie',
+      database: 'Beematie_1',
       username: process.env.DB_USER_DEV,
       password: process.env.DB_PASS_DEV
       }),
@@ -46,7 +48,7 @@ const main = async () => {
       ssl: true
     } : {}),
     ...(__prod__ ? {} : {synchronize: true} ),
-    entities: [User, Tutor, Admin, Subject, SubjectTutor],
+    entities: [User, Tutor, Admin, Subject, SubjectTutor, TutorProfile, UserProfile],
     migrations: [path.join(__dirname, '/migrations/*')]
   });
 
@@ -78,7 +80,7 @@ const main = async () => {
       maxAge: 60 * 60 * 1000*24, // 1 day in milliseconds
       httpOnly: true, // only send cookie over http
       secure: __prod__ || false, // cookie only works in https
-      sameSite: 'none',  // csrf
+      sameSite: __prod__ ? 'none' : 'lax',  // csrf
     },
     secret: process.env.SESSION_SECRET_DEV_PROD as string || "asdfasdfasdf",
     saveUninitialized: false, // don't create session until something stored
@@ -91,7 +93,11 @@ const main = async () => {
       validate: false
     }),
     context: ({ req, res }): MyContext => ({ req, res, connection, dataLoaders: buildDataLoaders() }),
-    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+    plugins: [__prod__ 
+              ? ApolloServerPluginLandingPageProductionDefault({
+                footer: false,
+              })
+              : ApolloServerPluginLandingPageGraphQLPlayground()],
     
   });
 

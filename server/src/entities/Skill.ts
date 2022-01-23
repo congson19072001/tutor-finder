@@ -1,7 +1,6 @@
 import { Field, ID, ObjectType } from "type-graphql";
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
-export type SkillLevel = "Beginner" | "Intermediate" | "Advanced";
 @ObjectType()
 @Entity()
 export class Skill extends BaseEntity{
@@ -19,19 +18,15 @@ export class Skill extends BaseEntity{
     description: string;
 
     @Field()
-    @Column({
-        type: "enum",
-        enum: ["Beginner", "Intermediate", "Advanced"],
-        default: "Beginner"
-    })
-    level!: SkillLevel;
+    @Column()
+    level!: string;
 
     @Field()
-    @CreateDateColumn()
+    @CreateDateColumn({type: 'timestamptz'})
     createdAt: Date;
 
     @Field()
-    @UpdateDateColumn()
+    @UpdateDateColumn({type: 'timestamptz'})
     updatedAt: Date;
 
 

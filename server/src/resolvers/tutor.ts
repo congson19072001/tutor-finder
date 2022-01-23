@@ -10,6 +10,8 @@ import { COOKIE_NAME } from "../constants";
 //import { Subject } from "../entities/Subject";
 import { checkAuthAdmin } from "../middleware/checkAuth";
 import { Subject } from "../entities/Subject";
+import { TutorProfile } from "../entities/TutorProfile";
+import { TutorGender, Province } from "../entities/TutorProfile";
 
 @Resolver(_of => Tutor)
 export class TutorResolver {
@@ -35,7 +37,7 @@ export class TutorResolver {
         if(!ctx.req.session.tutorId) {
             return null;
         }
-        const tutor = await Tutor.findOne(ctx.req.session.tutorId);
+        const tutor = await Tutor.findOne(ctx.req.session.tutorId, {relations: ["profile"]});
         return tutor;
 
     }
@@ -54,7 +56,7 @@ export class TutorResolver {
             }
         }
         try{
-            const {username, email, password, firstName, lastName} = registerInput;
+            const {username, email, password, fullName, salary, avatar, province, bio, address, age, gender} = registerInput;
             const existingTutor = await Tutor.findOne({where: [{email}, {username}]});
             if (existingTutor) {
                 return {
@@ -69,13 +71,27 @@ export class TutorResolver {
                     ]
                 }
             }
+            let nProvince = province as Province;
+            let nGender = gender as TutorGender;
             const hashedPassword = await argon2.hash(password);
+            const tProfile = TutorProfile.create({
+                bio,
+                address,
+                age,
+                province: nProvince,
+                gender: nGender,
+                avatar
+                
+            });
+            await tProfile.save();
             const newTutor = Tutor.create({
                 email,
                 username,
                 password: hashedPassword,
-                firstName,
-                lastName
+                fullName, 
+                salary, 
+                profile: tProfile
+                
             });
             await newTutor.save();
             ctx.req.session.tutorId = newTutor.id;

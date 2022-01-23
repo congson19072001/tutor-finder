@@ -12,6 +12,8 @@ import { sendEmail } from "../utils/sendEmail";
 import { TokenModel } from "../models/Token";
 import { v4 as uuidv4} from "uuid"; 
 import { ChangePasswordInput } from "../types/ChangePasswordInput";
+import { UserProfile } from "../entities/UserProfile";
+import { UserGender, Province } from "../entities/UserProfile";
 
 @Resolver()
 export class UserResolver {
@@ -23,7 +25,7 @@ export class UserResolver {
         if(!ctx.req.session.userId) {
             return null;
         }
-        const user = await User.findOne(ctx.req.session.userId);
+        const user = await User.findOne(ctx.req.session.userId,  { relations: ["profile"] });
         return user;
 
     }
@@ -42,7 +44,7 @@ export class UserResolver {
             }
         }
         try{
-            const {username, email, password, firstName, lastName} = registerInput;
+            const {username, email, password, fullName, address, age, province, avatar, gender} = registerInput;
             const existingUser = await User.findOne({where: [{email}, {username}]});
             if (existingUser) {
                 return {
@@ -58,12 +60,23 @@ export class UserResolver {
                 }
             }
             const hashedPassword = await argon2.hash(password);
+
+            let nProvince = province as Province;
+            let nGender = gender as UserGender;
+            const uProfile = UserProfile.create({
+                address,
+                age,
+                avatar,
+                gender: nGender,
+                province: nProvince,
+            })
+            await uProfile.save();
             const newUser = User.create({
                 email,
                 username,
                 password: hashedPassword,
-                firstName,
-                lastName
+                fullName,
+                profile: uProfile
             });
             await newUser.save();
             ctx.req.session.userId = newUser.id;

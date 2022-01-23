@@ -23,17 +23,13 @@ export class Admin extends BaseEntity {
 
     @Field(_type=>String)
     @Column()
-    firstName!: string;
-
-    @Field(_type=>String)
-    @Column()
-    lastName!: string;
+    fullName!: string;
 
     @Field()
-    @CreateDateColumn()
+    @CreateDateColumn({type: 'timestamptz'})
     createdAt: Date;
 
     @Field()
-    @UpdateDateColumn()
+    @UpdateDateColumn({type: 'timestamptz'})
     updatedAt: Date;
 }
