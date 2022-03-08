@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Tutor } from "./Tutor";
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+//import { Tutor } from "./Tutor";
 export type ResumeType = "Education" | "Work Experience" | "Certification";
 
 @ObjectType()
@@ -40,18 +40,11 @@ export class Resume extends BaseEntity{
     @Column({nullable: true})
     endYear: number;
 
-    @Field()
-    @CreateDateColumn({type: "timestamptz"})
-    createdAt: Date;
 
-    @Field(_type => Tutor, { nullable: true })
-    @ManyToOne(_type => Tutor, tutor => tutor.resumes)
-    @JoinColumn({ name: "tutorId" })
-    tutor: Promise<Tutor>;
-
-    @Field()
-    @UpdateDateColumn({type: "timestamptz"})
-    updatedAt: Date;
+    // @Field(_type => Tutor, { nullable: true })
+    // @ManyToOne(_type => Tutor, tutor => tutor.resumes)
+    // @JoinColumn({ name: "tutorId" })
+    // tutor: Promise<Tutor>;
 
 
 }

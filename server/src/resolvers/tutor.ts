@@ -2,7 +2,6 @@ import { Tutor } from "../entities/Tutor";
 import { Arg,  Ctx,  FieldResolver,  Mutation, Query, Resolver, Root, UseMiddleware } from "type-graphql";
 import argon2 from "argon2";
 import { TutorMutationResponse } from "../types/TutorMutationResponse";
-import { RegisterInput } from "../types/RegisterInput";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
 import { LoginInput } from "../types/LoginInput";
 import { MyContext } from "../types/MyContext";
@@ -11,7 +10,8 @@ import { COOKIE_NAME } from "../constants";
 import { checkAuthAdmin } from "../middleware/checkAuth";
 import { Subject } from "../entities/Subject";
 import { TutorProfile } from "../entities/TutorProfile";
-import { TutorGender, Province } from "../entities/TutorProfile";
+import { TutorGender, Province, TutorNotice, TutorBookingWindow } from "../entities/TutorProfile";
+import { TutorRegisterInput } from "../types/TutorRegisterInput";
 
 @Resolver(_of => Tutor)
 export class TutorResolver {
@@ -44,10 +44,10 @@ export class TutorResolver {
     @Mutation(_return => TutorMutationResponse)
     @UseMiddleware(checkAuthAdmin)
     async registerTutor(
-        @Arg("registerInput") registerInput: RegisterInput,
+        @Arg("tutorRegisterInput") tutorRegisterInput: TutorRegisterInput,
         @Ctx() ctx: MyContext
     ) : Promise<TutorMutationResponse> {
-        const validateRegisterInputErrors = validateRegisterInput(registerInput);
+        const validateRegisterInputErrors = validateRegisterInput(tutorRegisterInput);
         if(validateRegisterInputErrors !== null) {
             return {
                 code: 400,
@@ -56,7 +56,7 @@ export class TutorResolver {
             }
         }
         try{
-            const {username, email, password, fullName, salary, avatar, province, bio, address, age, gender} = registerInput;
+            const {username, email, password, fullName, salary, avatar, province, bio, address, age, gender, advanceNotice, bookingWindow} = tutorRegisterInput;
             const existingTutor = await Tutor.findOne({where: [{email}, {username}]});
             if (existingTutor) {
                 return {
@@ -73,6 +73,8 @@ export class TutorResolver {
             }
             let nProvince = province as Province;
             let nGender = gender as TutorGender;
+            let nAdvanceNotice = advanceNotice as TutorNotice;
+            let nBookingWindow = bookingWindow as TutorBookingWindow;
             const hashedPassword = await argon2.hash(password);
             const tProfile = TutorProfile.create({
                 bio,
@@ -80,6 +82,8 @@ export class TutorResolver {
                 age,
                 province: nProvince,
                 gender: nGender,
+                advanceNotice: nAdvanceNotice,
+                bookingWindow: nBookingWindow,
                 avatar
                 
             });

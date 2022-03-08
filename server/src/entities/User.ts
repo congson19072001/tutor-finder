@@ -1,6 +1,8 @@
 import { Field, ID, ObjectType } from "type-graphql";
 import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Review } from "./Review";
 import { Schedule } from "./Schedule";
+import { UserBalance } from "./UserBalance";
 import { UserProfile } from "./UserProfile";
 
 
@@ -32,8 +34,20 @@ export class User extends BaseEntity {
     @JoinColumn()
     profile: UserProfile;
 
+    @Field()
+    @OneToOne(() => UserBalance, { cascade: true })
+    @JoinColumn()
+    balance: UserBalance;
+
+    @Field(_type=> Boolean)
+    @Column({ default: false })
+    isOnline!: boolean;
+
     @Field(_type => [Schedule], { nullable: true })
     schedules: Schedule[];
+
+    @Field(_type => [Review], { nullable: true })
+    reviews: Review[];
 
     @Field()
     @CreateDateColumn({type: 'timestamptz'})

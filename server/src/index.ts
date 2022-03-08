@@ -25,6 +25,10 @@ import { buildDataLoaders } from './utils/dataLoaders';
 import path from 'path';
 import { UserProfile } from './entities/UserProfile';
 import { TutorProfile } from './entities/TutorProfile';
+import { Schedule } from './entities/Schedule';
+import { Resume } from './entities/Resume';
+import { Review } from './entities/Review';
+import { Availability } from './entities/Availability';
 
 const main = async () => {
   const connection = await createConnection({
@@ -48,7 +52,7 @@ const main = async () => {
       ssl: true
     } : {}),
     ...(__prod__ ? {} : {synchronize: true} ),
-    entities: [User, Tutor, Admin, Subject, SubjectTutor, TutorProfile, UserProfile],
+    entities: [User, Tutor, Admin, Subject, SubjectTutor, TutorProfile, UserProfile, Schedule, Resume, Review, Availability],
     migrations: [path.join(__dirname, '/migrations/*')]
   });
 

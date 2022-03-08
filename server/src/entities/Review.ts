@@ -3,13 +3,11 @@ import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColu
 import { Tutor } from "./Tutor";
 import { User } from "./User";
 
-export type ScheduleStatus = "pending" | "accepted" | "canceled" | "finished";
-export type ScheduleType = "one-to-one" | "group" | "trial";
 
 
 @ObjectType()
 @Entity()
-export class Schedule extends BaseEntity {
+export class Review extends BaseEntity {
     @Field(_type => ID)
     @PrimaryGeneratedColumn("uuid")
     id!: string;
@@ -23,42 +21,26 @@ export class Schedule extends BaseEntity {
     tutorId!: string;
 
     @Field(_type => Tutor)
-    @ManyToOne(_type => Tutor, tutor => tutor.schedules)
+    @ManyToOne(_type => Tutor, tutor => tutor.reviews)
     @JoinColumn({ name: "tutorId" })
     tutor!: Promise<Tutor>;
 
     @Field(_type => User)
-    @ManyToOne(_type => User, user => user.schedules)
+    @ManyToOne(_type => User, user => user.reviews)
     @JoinColumn({ name: "userId" })
     user!: Promise<User>;
 
-    @Field()
-    @Column({type: 'timestamptz'})
-    startTime!: Date;
-
-    @Field()
-    @Column({type: 'timestamptz'})
-    endTime!: Date;
-
     @Field(_type => String)
-    @Column({
-        type: 'enum',
-        enum: ["pending", "accepted", "canceled", "finished"],
-        default: "pending"
-    })
-    status!: string;
-
-    @Field(_type => String)
-    @Column({
-        type: 'enum',
-        enum: ["one-to-one", "group", "trial"],
-        default: "one-to-one"
-    })
-    type!: string;
+    @Column()
+    subject!: string;
 
     @Field(_type => String)
     @Column()
-    recurrenceRule: string;
+    content!: string;
+
+    @Field()
+    @Column()
+    score!: number;
 
     @Field()
     @CreateDateColumn({type: 'timestamptz'})
@@ -67,12 +49,6 @@ export class Schedule extends BaseEntity {
     @Field()
     @UpdateDateColumn({type: 'timestamptz'})
     updatedAt: Date;
-
-
-
-    
-
-
 
 
     

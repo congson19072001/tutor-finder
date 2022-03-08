@@ -2,7 +2,7 @@ import { Field, ID, ObjectType } from "type-graphql";
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export type UserGender = "Male" | "Female";
-export type Province = "An Giang"|"Bà Rịa - Vũng Tàu"|"Bắc Giang"|"Bắc Kạn"|"Bạc Liêu"|"Bắc Ninh"|"Bến Tre"|"Bình Định"|"Bình Dương"|"Bình Phước"|"Bình Thuận"|"Cà Mau"|"Cao Bằng"|"Đắk Lắk"|"Đắk Nông"|"Điện Biên"|"Đồng Nai"|"Đồng Tháp"|"Gia Lai"|"Hà Giang"|"Hà Nam"|"Hà Tĩnh"|"Hải Dương"|"Hậu Giang"|"Hòa Bình"|"Hưng Yên"|"Khánh Hòa"|"Kiên Giang"|"Kon Tum"|"Lai Châu"|"Lâm Đồng"|"Lạng Sơn"|"Lào Cai"|"Long An"|"Nam Định"|"Nghệ An"|"Ninh Bình"|"Ninh Thuận"|"Phú Thọ"|"Quảng Bình"|"Quảng Nam"|"Quảng Ngãi"|"Quảng Ninh"|"Quảng Trị"|"Sóc Trăng"|"Sơn La"|"Tây Ninh"|"Thái Bình"|"Thái Nguyên"|"Thanh Hóa"|"Thừa Thiên Huế"|"Tiền Giang"|"Trà Vinh"|"Tuyên Quang"|"Vĩnh Long"|"Vĩnh Phúc"|"Yên Bái"|"Phú Yên"|"Cần Thơ"|"Đà Nẵng"|"Hải Phòng"|"Hà Nội"|"TP HCM";
+//export type Province = "An Giang"|"Bà Rịa - Vũng Tàu"|"Bắc Giang"|"Bắc Kạn"|"Bạc Liêu"|"Bắc Ninh"|"Bến Tre"|"Bình Định"|"Bình Dương"|"Bình Phước"|"Bình Thuận"|"Cà Mau"|"Cao Bằng"|"Đắk Lắk"|"Đắk Nông"|"Điện Biên"|"Đồng Nai"|"Đồng Tháp"|"Gia Lai"|"Hà Giang"|"Hà Nam"|"Hà Tĩnh"|"Hải Dương"|"Hậu Giang"|"Hòa Bình"|"Hưng Yên"|"Khánh Hòa"|"Kiên Giang"|"Kon Tum"|"Lai Châu"|"Lâm Đồng"|"Lạng Sơn"|"Lào Cai"|"Long An"|"Nam Định"|"Nghệ An"|"Ninh Bình"|"Ninh Thuận"|"Phú Thọ"|"Quảng Bình"|"Quảng Nam"|"Quảng Ngãi"|"Quảng Ninh"|"Quảng Trị"|"Sóc Trăng"|"Sơn La"|"Tây Ninh"|"Thái Bình"|"Thái Nguyên"|"Thanh Hóa"|"Thừa Thiên Huế"|"Tiền Giang"|"Trà Vinh"|"Tuyên Quang"|"Vĩnh Long"|"Vĩnh Phúc"|"Yên Bái"|"Phú Yên"|"Cần Thơ"|"Đà Nẵng"|"Hải Phòng"|"Hà Nội"|"TP HCM";
 
 @ObjectType()
 @Entity()
@@ -20,9 +20,13 @@ export class UserProfile extends BaseEntity {
         default: "Male"
     })
     gender: UserGender;
+
+    @Field(_type=>String)
+    @Column()
+    timezone!: string;
     
 
-    @Field(_type=>String,{nullable: true})
+    @Field(_type=>Number,{nullable: true})
     @Column({nullable: true})
     age: number;
 
@@ -31,12 +35,8 @@ export class UserProfile extends BaseEntity {
     address!: string;
 
     @Field()
-    @Column({
-        type: "enum",
-        enum: ["An Giang","Bà Rịa - Vũng Tàu","Bắc Giang","Bắc Kạn","Bạc Liêu","Bắc Ninh","Bến Tre","Bình Định","Bình Dương","Bình Phước","Bình Thuận","Cà Mau","Cao Bằng","Đắk Lắk","Đắk Nông","Điện Biên","Đồng Nai","Đồng Tháp","Gia Lai","Hà Giang","Hà Nam","Hà Tĩnh","Hải Dương","Hậu Giang","Hòa Bình","Hưng Yên","Khánh Hòa","Kiên Giang","Kon Tum","Lai Châu","Lâm Đồng","Lạng Sơn","Lào Cai","Long An","Nam Định","Nghệ An","Ninh Bình","Ninh Thuận","Phú Thọ","Quảng Bình","Quảng Nam","Quảng Ngãi","Quảng Ninh","Quảng Trị","Sóc Trăng","Sơn La","Tây Ninh","Thái Bình","Thái Nguyên","Thanh Hóa","Thừa Thiên Huế","Tiền Giang","Trà Vinh","Tuyên Quang","Vĩnh Long","Vĩnh Phúc","Yên Bái","Phú Yên","Cần Thơ","Đà Nẵng","Hải Phòng","Hà Nội","TP HCM"],
-        default: "Hà Nội"
-    })
-    province: Province;
+    @Column()
+    country: string;
 
     @Field(_type=>String)
     @Column({default: "https://pic.onlinewebfonts.com/svg/img_264570.png"})
