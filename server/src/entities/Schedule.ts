@@ -60,6 +60,10 @@ export class Schedule extends BaseEntity {
     @Column()
     recurrenceRule: string;
 
+    @Field(_type => String)
+    @Column()
+    subject: string;
+
     @Field()
     @CreateDateColumn({type: 'timestamptz'})
     createdAt: Date;

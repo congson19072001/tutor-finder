@@ -10,7 +10,7 @@ import { COOKIE_NAME } from "../constants";
 import { checkAuthAdmin } from "../middleware/checkAuth";
 import { Subject } from "../entities/Subject";
 import { TutorProfile } from "../entities/TutorProfile";
-import { TutorGender, Province, TutorNotice, TutorBookingWindow } from "../entities/TutorProfile";
+import { TutorGender, TutorNotice, TutorBookingWindow } from "../entities/TutorProfile";
 import { TutorRegisterInput } from "../types/TutorRegisterInput";
 
 @Resolver(_of => Tutor)

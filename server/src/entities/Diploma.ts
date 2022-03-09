@@ -30,7 +30,7 @@ export class Diploma extends BaseEntity{
 
     @Field(_type => String)
     @Column()
-    University!: string;
+    university!: string;
 
     @Field(_type => String)
     @Column()

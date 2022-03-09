@@ -18,7 +18,6 @@ export class Certification extends BaseEntity{
     @Column()
     certificate!: string;
 
-
     @Field(_type => String)
     @Column()
     subject!: String;
