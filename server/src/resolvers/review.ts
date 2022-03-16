@@ -91,7 +91,7 @@ export class ReviewResolver {
             return {
                 code: 200,
                 success: true,
-                message: "Review connected to tutor successfully",
+                message: "Review deleted successfully",
                 
             }
         });

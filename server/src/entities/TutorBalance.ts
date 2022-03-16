@@ -11,7 +11,7 @@ export class TutorBalance {
     id!: string;
 
     @Field(_type => Number)
-    @Column("numeric", { precision: 15, scale: 5 })
+    @Column("numeric", { precision: 15, scale: 5, default: 0 })
     ammount!: number;
 
     @Field(_type => String)

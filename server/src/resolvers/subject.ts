@@ -6,7 +6,7 @@ import { CreateSubjectInput } from "../types/CreateSubjectInput";
 import { checkAuthAdmin, checkAuthTutor } from "../middleware/checkAuth";
 //import { Tutor } from "../entities/Tutor";
 import { PaginatedSubjects } from "../types/PaginatedSubjects";
-import { LessThan } from "typeorm";
+import { LessThan, ILike  } from "typeorm";
 import { MyContext } from "../types/MyContext";
 import { UserInputError } from "apollo-server-core";
 import { SubjectTutor } from "../entities/SubjectTutor";
@@ -23,9 +23,9 @@ export class SubjectResolver {
     @FieldResolver(_return => [Tutor])
     async tutors(
         @Root() root: Subject,
-        @Ctx() { dataLoaders : {tutorsLoader}} : MyContext
+        @Ctx() { dataLoaders : {subjectTutorsLoader}} : MyContext
     ): Promise<Tutor[] | undefined> {
-        return await tutorsLoader.load(root.id);
+        return await subjectTutorsLoader.load(root.id);
     }
 
     @Mutation(() => SubjectMutationResponse)
@@ -123,6 +123,22 @@ export class SubjectResolver {
                 where: {
                     title: title,
                 }
+            });
+            return subject;
+        }
+        catch(err){
+            console.log(err);
+            return undefined;
+        }
+    }
+
+    @Query(() => [Subject], { nullable: true })
+    async searchSubjects(
+        @Arg("title", _type => String) title: string
+    ) : Promise<Subject[] | undefined> {
+        try{
+            const subject = await Subject.find({
+                title: ILike(`%${title}%`),
             });
             return subject;
         }

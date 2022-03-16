@@ -26,9 +26,31 @@ import path from 'path';
 import { UserProfile } from './entities/UserProfile';
 import { TutorProfile } from './entities/TutorProfile';
 import { Schedule } from './entities/Schedule';
-import { Resume } from './entities/Resume';
 import { Review } from './entities/Review';
 import { Availability } from './entities/Availability';
+import { AvailabilityApplication } from './entities/AvailabilityApplication';
+import { Certification } from './entities/Certification';
+import { CertificationApplication } from './entities/CertificationApplication';
+import { Diploma } from './entities/Diploma';
+import { DiplomaApplication } from './entities/DiplomaApplication';
+import { Request } from './entities/Request';
+import { Speciality } from './entities/Speciality';
+import { SpecialityTutor } from './entities/SpecialityTutor';
+import { TutorApplication } from './entities/TutorApplication';
+import { TutorBalance } from './entities/TutorBalance';
+import { UserBalance } from './entities/UserBalance';
+import { AvailabilityResolver } from './resolvers/availability';
+import { AvailabilityApplicationResolver } from './resolvers/availabilityApp';
+import { CertificationResolver } from './resolvers/certification';
+import { CertificationApplicationResolver } from './resolvers/certificationApp';
+import { DiplomaResolver } from './resolvers/diploma';
+import { DiplomaApplicationResolver } from './resolvers/diplomaApp';
+import { SpecialityResolver } from './resolvers/speciality';
+import { ReviewResolver } from './resolvers/review';
+import { ScheduleResolver } from './resolvers/schedule';
+import { TutorApplicationResolver } from './resolvers/tutorApp';
+import { TutorProfileResolver } from './resolvers/tutorProfile';
+import { UserProfileResolver } from './resolvers/userProfile';
 
 const main = async () => {
   const connection = await createConnection({
@@ -52,7 +74,9 @@ const main = async () => {
       ssl: true
     } : {}),
     ...(__prod__ ? {} : {synchronize: true} ),
-    entities: [User, Tutor, Admin, Subject, SubjectTutor, TutorProfile, UserProfile, Schedule, Resume, Review, Availability],
+    entities: [User, Tutor, Admin, Subject, SubjectTutor, TutorProfile, UserProfile, Schedule, Request, Review, Availability, 
+      AvailabilityApplication, Certification, CertificationApplication, Diploma, DiplomaApplication, Speciality, SpecialityTutor,
+      TutorApplication, TutorBalance, UserBalance],    
     migrations: [path.join(__dirname, '/migrations/*')]
   });
 
@@ -93,7 +117,9 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, UserResolver, TutorResolver,SubjectResolver, AdminResolver], 
+      resolvers: [HelloResolver, UserResolver, TutorResolver,SubjectResolver, AdminResolver, AvailabilityResolver, AvailabilityApplicationResolver,
+      CertificationResolver, CertificationApplicationResolver, DiplomaResolver, DiplomaApplicationResolver, ReviewResolver, SpecialityResolver,
+      ScheduleResolver, TutorApplicationResolver, TutorProfileResolver, UserProfileResolver ], 
       validate: false
     }),
     context: ({ req, res }): MyContext => ({ req, res, connection, dataLoaders: buildDataLoaders() }),

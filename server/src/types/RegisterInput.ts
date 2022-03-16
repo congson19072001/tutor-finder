@@ -1,23 +1,7 @@
-import { Field, InputType } from "type-graphql";
+import { Field, InterfaceType } from "type-graphql";
 
-@InputType()
-export class RegisterInput {
-    @Field({nullable: true})
-    gender?: string
-
-    @Field({nullable: true})
-    age?: number
-
-    @Field({nullable: true})
-    address?: string
-    
-
-    @Field()
-    province : string
-
-    @Field({nullable: true})
-    avatar?: string
-    
+@InterfaceType()
+export abstract class IRegisterInput {
     @Field()
     username: string
 
@@ -29,11 +13,6 @@ export class RegisterInput {
 
     @Field()
     fullName: string
-
-    // @Field({nullable: true})
-    // salary?: number
-
-    
 
 
 }

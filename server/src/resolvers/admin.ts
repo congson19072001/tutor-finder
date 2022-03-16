@@ -6,7 +6,7 @@ import { checkAuthAdmin } from "../middleware/checkAuth";
 import { AdminMutationResponse } from "../types/AdminMutationResponse";
 import { LoginInput } from "../types/LoginInput";
 import { MyContext } from "../types/MyContext";
-import { RegisterInput } from "../types/RegisterInput";
+import { IRegisterInput } from "../types/RegisterInput";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
 
 @Resolver(_of => Admin)
@@ -27,7 +27,7 @@ export class AdminResolver {
     @Mutation(_return => AdminMutationResponse)
     @UseMiddleware(checkAuthAdmin)
     async registerAdmin(
-        @Arg("registerInput") registerInput: RegisterInput,
+        @Arg("registerInput") registerInput: IRegisterInput,
         @Ctx() ctx: MyContext
     ) : Promise<AdminMutationResponse> {
         const validateRegisterInputErrors = validateRegisterInput(registerInput);

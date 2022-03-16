@@ -2,7 +2,6 @@ import { User } from "../entities/User";
 import { Arg,  Ctx,  Mutation, Query, Resolver } from "type-graphql";
 import argon2 from "argon2";
 import { UserMutationResponse } from "../types/UserMutationResponse";
-import { RegisterInput } from "../types/RegisterInput";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
 import { LoginInput } from "../types/LoginInput";
 import { MyContext } from "../types/MyContext";
@@ -13,7 +12,8 @@ import { TokenModel } from "../models/Token";
 import { v4 as uuidv4} from "uuid"; 
 import { ChangePasswordInput } from "../types/ChangePasswordInput";
 import { UserProfile } from "../entities/UserProfile";
-import { UserGender, Province } from "../entities/UserProfile";
+import { UserGender } from "../entities/UserProfile";
+import { UserRegisterInput } from "src/types/UserRegisterInput";
 
 @Resolver()
 export class UserResolver {
@@ -32,7 +32,7 @@ export class UserResolver {
 
     @Mutation(_return => UserMutationResponse)
     async register(
-        @Arg("registerInput") registerInput: RegisterInput,
+        @Arg("registerInput") registerInput: UserRegisterInput,
         @Ctx() ctx: MyContext
     ) : Promise<UserMutationResponse> {
         const validateRegisterInputErrors = validateRegisterInput(registerInput);
@@ -44,7 +44,7 @@ export class UserResolver {
             }
         }
         try{
-            const {username, email, password, fullName, address, age, province, avatar, gender} = registerInput;
+            const {username, email, password, fullName, address, age, country, avatar, gender, timezone} = registerInput;
             const existingUser = await User.findOne({where: [{email}, {username}]});
             if (existingUser) {
                 return {
@@ -60,15 +60,14 @@ export class UserResolver {
                 }
             }
             const hashedPassword = await argon2.hash(password);
-
-            let nProvince = province as Province;
             let nGender = gender as UserGender;
             const uProfile = UserProfile.create({
+                country,
                 address,
                 age,
                 avatar,
                 gender: nGender,
-                province: nProvince,
+                timezone
             })
             await uProfile.save();
             const newUser = User.create({
@@ -178,7 +177,7 @@ export class UserResolver {
         if(!user) {
             return true;
         }
-        await TokenModel.findOneAndDelete({userID: user.id})
+        await TokenModel.findOneAndDelete({userId: user.id})
         const resetToken = uuidv4();
         const hashedResetToken = await argon2.hash(resetToken);
 

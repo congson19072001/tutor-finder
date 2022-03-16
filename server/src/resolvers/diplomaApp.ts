@@ -1,13 +1,13 @@
 import { DiplomaApplication, DiplomaType } from "../entities/DiplomaApplication";
 import { Arg, Ctx, ID, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
-import { Tutor } from "../entities/Tutor";
+import { TutorApplication } from "../entities/TutorApplication";
 import { MyContext } from "../types/MyContext";
 import { checkAuthTutor } from "../middleware/checkAuth";
 import { DiplomaAppMutationResponse } from "../types/DiplomaAppMutationResponse";
 import { CreateDiplomaInput } from "src/types/CreateDiplomaInput";
 
 @Resolver(_of => DiplomaApplication)
-export class DiplomaResolver {
+export class DiplomaApplicationResolver {
 
     @Mutation(_return => DiplomaAppMutationResponse)
     @UseMiddleware(checkAuthTutor)
@@ -18,9 +18,9 @@ export class DiplomaResolver {
         const tutorId = myContext.req.session.tutorId;
         const connection = myContext.connection;
         return await connection.transaction(async transactionEntityManager =>{
-            const tutor = await transactionEntityManager.findOne(Tutor,tutorId);
+            const tutor = await transactionEntityManager.findOne(TutorApplication,tutorId);
             if(!tutor) {
-                throw new Error('Tutor not found');
+                throw new Error('TutorApplication not found');
             }
 
 
@@ -77,9 +77,9 @@ export class DiplomaResolver {
         @Arg("diplomaId", _type => ID) diplomaId: string
     ) : Promise<DiplomaAppMutationResponse> {
         return await connection.transaction(async transactionEntityManager =>{
-            const tutor = await transactionEntityManager.findOne(Tutor,tutorId);
+            const tutor = await transactionEntityManager.findOne(TutorApplication,tutorId);
             if(!tutor) {
-                throw new Error('Tutor not found');
+                throw new Error('TutorApplication not found');
             }
 
             await transactionEntityManager.delete(DiplomaApplication, diplomaId);
@@ -99,9 +99,9 @@ export class DiplomaResolver {
     async getMyDiplomasApp(
         @Ctx() {req: {session: {tutorId}}, connection}: MyContext
     ) : Promise<DiplomaApplication[]> {
-        const tutor = await connection.getRepository(Tutor).findOne(tutorId);
+        const tutor = await connection.getRepository(TutorApplication).findOne(tutorId);
         if(!tutor) {
-            throw new Error('Tutor not found');
+            throw new Error('TutorApplication not found');
         }
         return await connection.getRepository(DiplomaApplication).find({
             where: {
@@ -115,9 +115,9 @@ export class DiplomaResolver {
         @Arg("tutorId", _type => ID) tutorId: string,
         @Ctx() {connection}: MyContext
     ) : Promise<DiplomaApplication[]> {
-        const tutor = await connection.getRepository(Tutor).findOne(tutorId);
+        const tutor = await connection.getRepository(TutorApplication).findOne(tutorId);
         if(!tutor) {
-            throw new Error('Tutor not found');
+            throw new Error('TutorApplication not found');
         }
         return await connection.getRepository(DiplomaApplication).find({
             where: {

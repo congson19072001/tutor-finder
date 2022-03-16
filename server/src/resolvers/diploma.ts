@@ -88,7 +88,7 @@ export class DiplomaResolver {
             return {
                 code: 200,
                 success: true,
-                message: "Diploma connected to tutor successfully",
+                message: "Diploma deleted successfully",
                 
             }
         });

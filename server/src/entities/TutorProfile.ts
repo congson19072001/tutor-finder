@@ -56,7 +56,6 @@ export class TutorProfile extends BaseEntity {
     @Column()
     timezone!: string;
 
-
     @Field(_type=>String)
     @Column({default: "https://pic.onlinewebfonts.com/svg/img_264570.png"})
     avatar!: string;

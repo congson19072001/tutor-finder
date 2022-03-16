@@ -1,6 +1,6 @@
-import { RegisterInput } from "../types/RegisterInput";
+import { IRegisterInput } from "../types/RegisterInput";
 
-export const validateRegisterInput = (registerInput: RegisterInput) => {
+export const validateRegisterInput = (registerInput: IRegisterInput) => {
     if(registerInput.fullName === "") {
         return [
             {

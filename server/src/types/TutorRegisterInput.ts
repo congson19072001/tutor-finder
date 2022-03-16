@@ -1,25 +1,8 @@
 import { Field, InputType } from "type-graphql";
+import { IRegisterInput } from "./RegisterInput";
 
 @InputType()
-export class TutorRegisterInput {
-    @Field({nullable: true})
-    gender?: string
-
-    @Field({nullable: true})
-    age?: number
-
-    @Field({nullable: true})
-    address?: string
-
-    @Field({nullable: true})
-    bio?: string
-
-    @Field()
-    province : string
-
-    @Field({nullable: true})
-    avatar?: string
-    
+export class TutorRegisterInput implements IRegisterInput{
     @Field()
     username: string
 
@@ -31,19 +14,6 @@ export class TutorRegisterInput {
 
     @Field()
     fullName: string
-
-    @Field({nullable: true})
-    salary?: number
-
-    @Field({nullable: true})
-    advanceNotice?: string
-
-    @Field({nullable: true})
-    bookingWindow?: string
-
-
-
-    
 
 
 }

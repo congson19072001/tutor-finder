@@ -30,11 +30,11 @@ export class TutorApplication extends BaseEntity {
 
     @Field(_type=>String)
     @Column()
-    fullName: string;
+    fullName!: string;
 
-    @Field(_type=>String)
-    @Column()
-    subject: string;
+    @Field(_type=>ID, {nullable: true})
+    @Column("uuid", {nullable: true})
+    subjectId: string;
 
     @Field({nullable: true})
     @Column({nullable: true})
@@ -52,13 +52,13 @@ export class TutorApplication extends BaseEntity {
     })
     gender: TutorGender;
     
-    @Field()
-    @Column()
+    @Field({nullable: true})
+    @Column({nullable: true})
     country: string;
 
-    @Field(_type=>String)
-    @Column()
-    videoUrl!: string;
+    @Field(_type=>String, {nullable: true})
+    @Column({nullable: true})
+    videoUrl: string;
 
     @Field(_type=>String)
     @Column({default: "https://pic.onlinewebfonts.com/svg/img_264570.png"})
@@ -86,10 +86,10 @@ export class TutorApplication extends BaseEntity {
 
     @Field(_type=>String)
     @Column({default: ""})
-    address!: string;
+    address: string;
 
-    @Field(_type=>String)
-    @Column()
+    @Field(_type=>String, {nullable: true})
+    @Column({nullable: true})
     timezone: string;
 
 
@@ -103,6 +103,10 @@ export class TutorApplication extends BaseEntity {
 
     @Field(_type => [AvailabilityApplication], { nullable: true })
     availabilities: AvailabilityApplication[];
+
+    @Field(_type => Boolean)
+    @Column({default: false})
+    isValid: boolean;
 
     @Field()
     @CreateDateColumn({type: 'timestamptz'})
