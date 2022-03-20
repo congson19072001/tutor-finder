@@ -15,7 +15,7 @@ export class AvailabilityApplication extends BaseEntity {
     tutorId!: string;
 
     @Field(_type => TutorApplication)
-    @ManyToOne(_type => TutorApplication, tutor => tutor.availabilities)
+    @ManyToOne(_type => TutorApplication, tutor => tutor.availabilityApplications)
     @JoinColumn({ name: "tutorId" })
     tutor!: Promise<TutorApplication>;
 

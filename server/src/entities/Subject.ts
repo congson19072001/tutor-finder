@@ -1,5 +1,6 @@
 import { Field, ID, ObjectType } from "type-graphql";
 import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Speciality } from "./Speciality";
 import { SubjectTutor } from "./SubjectTutor";
 import { Tutor } from "./Tutor";
 
@@ -12,11 +13,14 @@ export class Subject extends BaseEntity{
     id!: string;
 
     @Field(_type=>String)
-    @Column()
+    @Column({unique: true})
     title!: string;
 
     @OneToMany(_to => SubjectTutor, st => st.subject)
     tutorConnection: SubjectTutor[];
+
+    @OneToMany(_to => Speciality, st => st.subject)
+    specialities : Speciality[];
 
     @Field()
     @Column({default: 0})

@@ -15,8 +15,8 @@ export class UserRegisterInput implements IRegisterInput {
     @Field()
     country: string
 
-    @Field()
-    timezone: string
+    @Field({nullable: true})
+    timezone?: string
 
     @Field({nullable: true})
     avatar?: string

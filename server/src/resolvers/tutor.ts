@@ -91,9 +91,21 @@ export class TutorResolver {
         if(!ctx.req.session.tutorId) {
             return null;
         }
-        const tutor = await Tutor.findOne(ctx.req.session.tutorId, {relations: ["profile"]});
+        const tutor = await Tutor.findOne(ctx.req.session.tutorId, {relations: ["profile", "balance"]});
         return tutor;
 
+    }
+
+    @Query(_return => [Tutor], {nullable: true})
+    async getAllTutors(
+    ): Promise<Tutor[] | undefined> {
+        try {
+            return await Tutor.find();
+        
+        }catch(errors){
+            console.log(errors);
+            return undefined;
+        }
     }
 
     @Mutation(_return => TutorMutationResponse)
@@ -254,6 +266,7 @@ export class TutorResolver {
             const existingTutor = await Tutor.findOne(
                 usernameOrEmail.includes("@") ? {email: usernameOrEmail} : {username: usernameOrEmail});
             if(!existingTutor) {
+                
                 return {
                     code: 400,
                     success: false,
@@ -318,7 +331,7 @@ export class TutorResolver {
     }
 
     @Mutation(_return => Boolean)
-    async forgotPassword(
+    async forgotPasswordTutor(
         @Arg("forgotPasswordInput") forgotPasswordInput: ForgotPasswordInput
     ) : Promise<boolean> {
         const tutor = await Tutor.findOne({email: forgotPasswordInput.email});
@@ -343,7 +356,7 @@ export class TutorResolver {
     }
 
     @Mutation(_return => TutorMutationResponse)
-    async changePassword(
+    async changePasswordTutor(
         @Ctx() ctx: MyContext,
         @Arg('token') token: string,
         @Arg('tutorId') tutorId: string,

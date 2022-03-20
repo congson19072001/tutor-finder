@@ -1,8 +1,9 @@
 import { Field, ID, ObjectType } from "type-graphql";
-import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { AvailabilityApplication } from "./AvailabilityApplication";
 import { CertificationApplication } from "./CertificationApplication";
 import { DiplomaApplication } from "./DiplomaApplication";
+import { Subject } from "./Subject";
 
 export type TutorGender = "Male" | "Female";
 export type TutorNotice = "at_least_1_hour" | "at_least_3_hour" | "at_least_6_hour" | "at_least_12_hour" | "at_least_1_day" | "at_least_2_day";
@@ -35,6 +36,10 @@ export class TutorApplication extends BaseEntity {
     @Field(_type=>ID, {nullable: true})
     @Column("uuid", {nullable: true})
     subjectId: string;
+
+    @Field(_type=>Subject, {nullable: true})
+    @JoinColumn({name: "subjectId"})
+    subject: Subject;
 
     @Field({nullable: true})
     @Column({nullable: true})
@@ -95,14 +100,14 @@ export class TutorApplication extends BaseEntity {
 
     @Field(_type => [CertificationApplication], { nullable: true })
     @OneToMany(() => CertificationApplication, c => c.tutor, { cascade: true, nullable: true })
-    certifications: CertificationApplication[];
+    certificationApplications: CertificationApplication[];
 
     @Field(_type => [DiplomaApplication], { nullable: true })
     @OneToMany(() => DiplomaApplication, d => d.tutor, { cascade: true, nullable: true })
-    diplomas: DiplomaApplication[];
+    diplomaApplications: DiplomaApplication[];
 
     @Field(_type => [AvailabilityApplication], { nullable: true })
-    availabilities: AvailabilityApplication[];
+    availabilityApplications: AvailabilityApplication[];
 
     @Field(_type => Boolean)
     @Column({default: false})

@@ -1,7 +1,7 @@
 import { UserProfile } from "../entities/UserProfile";
 import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { UserProfileMutationResponse } from "../types/UserProfileMutationResponse";
-import { checkAuthUser } from "src/middleware/checkAuth";
+import { checkAuthUser } from "../middleware/checkAuth";
 import { UpdateUFInput } from "../types/UpdateUFInput";
 import { MyContext } from "../types/MyContext";
 import { User } from "../entities/User";
@@ -16,7 +16,7 @@ export class UserProfileResolver {
         @Arg("updateUserProfileInput") updateUserProfileInput: UpdateUFInput,
         @Ctx() {req: {session: {userId}}, connection}: MyContext,
     ): Promise<UserProfileMutationResponse> {
-        const user = await connection.getRepository(User).findOne(userId);
+        const user = await connection.getRepository(User).findOne(userId, {relations: ["profile"]});
         if (!user) {
             return {
                 code: 401,

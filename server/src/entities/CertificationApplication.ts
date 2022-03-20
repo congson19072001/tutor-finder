@@ -44,7 +44,7 @@ export class CertificationApplication extends BaseEntity{
 
 
     @Field(_type => TutorApplication, { nullable: true })
-    @ManyToOne(_type => TutorApplication, tutor => tutor.certifications)
+    @ManyToOne(_type => TutorApplication, tutor => tutor.certificationApplications)
     @JoinColumn({ name: "tutorId" })
     tutor: Promise<TutorApplication>;
 

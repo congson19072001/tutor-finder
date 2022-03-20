@@ -4,7 +4,7 @@ import { TutorApplication } from "../entities/TutorApplication";
 import { MyContext } from "../types/MyContext";
 import { checkAuthTutor } from "../middleware/checkAuth";
 import { CertificationMutationResponse } from "../types/CertificationMutationResponse";
-import { CreateCertificationInput } from "src/types/CreateCertificationInput";
+import { CreateCertificationInput } from "../types/CreateCertificationInput";
 
 @Resolver(_of => CertificationApplication)
 export class CertificationApplicationResolver {

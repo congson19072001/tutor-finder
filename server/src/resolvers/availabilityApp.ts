@@ -4,7 +4,7 @@ import { TutorApplication } from "../entities/TutorApplication";
 import { MyContext } from "../types/MyContext";
 import { checkAuthTutor } from "../middleware/checkAuth";
 import { AvailabilityMutationResponse } from "../types/AvailabilityMutationResponse";
-import { CreateAvailabilityInput } from "src/types/CreateAvailabilityInput";
+import { CreateAvailabilityInput } from "../types/CreateAvailabilityInput";
 import { LessThan, MoreThan } from "typeorm";
 
 @Resolver(_of => AvailabilityApplication)

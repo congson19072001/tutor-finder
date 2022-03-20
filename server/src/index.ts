@@ -60,7 +60,7 @@ const main = async () => {
         url: process.env.DATABASE_URL,
       }
       : {
-      database: 'Beematie_1',
+      database: 'Beematie',
       username: process.env.DB_USER_DEV,
       password: process.env.DB_PASS_DEV
       }),

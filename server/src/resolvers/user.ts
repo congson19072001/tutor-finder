@@ -1,5 +1,5 @@
 import { User } from "../entities/User";
-import { Arg,  Ctx,  Mutation, Query, Resolver } from "type-graphql";
+import { Arg,  Ctx,  FieldResolver,  Mutation, Query, Resolver, Root } from "type-graphql";
 import argon2 from "argon2";
 import { UserMutationResponse } from "../types/UserMutationResponse";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
@@ -13,9 +13,11 @@ import { v4 as uuidv4} from "uuid";
 import { ChangePasswordInput } from "../types/ChangePasswordInput";
 import { UserProfile } from "../entities/UserProfile";
 import { UserGender } from "../entities/UserProfile";
-import { UserRegisterInput } from "src/types/UserRegisterInput";
+import { UserRegisterInput } from "../types/UserRegisterInput";
+import { UserBalance } from "../entities/UserBalance";
+import { Schedule } from "../entities/Schedule";
 
-@Resolver()
+@Resolver(_of => User)
 export class UserResolver {
 
     @Query(_return => User, {nullable: true})
@@ -25,74 +27,91 @@ export class UserResolver {
         if(!ctx.req.session.userId) {
             return null;
         }
-        const user = await User.findOne(ctx.req.session.userId,  { relations: ["profile"] });
+        const user = await User.findOne(ctx.req.session.userId,  { relations: ["profile", "balance"] });
         return user;
 
+    }
+
+    @FieldResolver(_return => [Schedule])
+    async schedules(
+        @Root() user: User
+    ): Promise<Schedule[]> {
+        return await Schedule.find({where: {userId: user.id}});
     }
 
     @Mutation(_return => UserMutationResponse)
     async register(
         @Arg("registerInput") registerInput: UserRegisterInput,
-        @Ctx() ctx: MyContext
+        @Ctx() myContext: MyContext
     ) : Promise<UserMutationResponse> {
-        const validateRegisterInputErrors = validateRegisterInput(registerInput);
-        if(validateRegisterInputErrors !== null) {
-            return {
-                code: 400,
-                success: false,
-                ...validateRegisterInputErrors
-            }
-        }
-        try{
-            const {username, email, password, fullName, address, age, country, avatar, gender, timezone} = registerInput;
-            const existingUser = await User.findOne({where: [{email}, {username}]});
-            if (existingUser) {
+        const connection = myContext.connection;
+        return await connection.transaction(async transactionEntityManager =>{
+            const validateRegisterInputErrors = validateRegisterInput(registerInput);
+            if(validateRegisterInputErrors !== null) {
                 return {
                     code: 400,
                     success: false,
-                    message: "User already exists",
-                    errors: [
-                        {
-                            field: existingUser.username === username ? 'username' : 'email', 
-                            message: `${ existingUser.username === username ? 'Username' : 'Email'} already exists`
-                        }
-                    ]
+                    ...validateRegisterInputErrors
                 }
             }
-            const hashedPassword = await argon2.hash(password);
-            let nGender = gender as UserGender;
-            const uProfile = UserProfile.create({
-                country,
-                address,
-                age,
-                avatar,
-                gender: nGender,
-                timezone
-            })
-            await uProfile.save();
-            const newUser = User.create({
-                email,
-                username,
-                password: hashedPassword,
-                fullName,
-                profile: uProfile
-            });
-            await newUser.save();
-            ctx.req.session.userId = newUser.id;
-            return {
-                code: 200,
-                success: true,
-                message: "User registration successfully",
-                user: newUser
+            try{
+                const {username, email, password, fullName, address, age, country, avatar, gender, timezone} = registerInput;
+                const existingUser = await transactionEntityManager.findOne(User, {where: [{email}, {username}]});
+                if (existingUser) {
+                    return {
+                        code: 400,
+                        success: false,
+                        message: "User already exists",
+                        errors: [
+                            {
+                                field: existingUser.username === username ? 'username' : 'email', 
+                                message: `${ existingUser.username === username ? 'Username' : 'Email'} already exists`
+                            }
+                        ]
+                    }
+                }
+                const hashedPassword = await argon2.hash(password);
+                let nGender = gender as UserGender;
+                const uProfile = transactionEntityManager.create(UserProfile,{
+                    country,
+                    address,
+                    age,
+                    avatar,
+                    gender: nGender,
+                    timezone : timezone ? timezone : (Intl.DateTimeFormat().resolvedOptions().timeZone)
+                })
+                await transactionEntityManager.save(uProfile);
+                const uBalance = transactionEntityManager.create(UserBalance, {
+                    ammount: 0,
+                    unit: country == "Vietnam" ? "VND" : "USD"
+
+                });
+                await transactionEntityManager.save(uBalance);
+                const newUser = transactionEntityManager.create(User,{
+                    email,
+                    username,
+                    password: hashedPassword,
+                    fullName,
+                    profile: uProfile,
+                    balance: uBalance
+                });
+                await transactionEntityManager.save(newUser);
+                myContext.req.session.userId = newUser.id;
+                return {
+                    code: 200,
+                    success: true,
+                    message: "User registration successfully",
+                    user: newUser
+                }
+            } catch(err) {
+                console.log(err);
+                return {
+                    code: 500,
+                    success: false,
+                    message: `Internal server error ${err.message}`
+                }
             }
-        } catch(err) {
-            console.log(err);
-            return {
-                code: 500,
-                success: false,
-                message: `Internal server error ${err.message}`
-            }
-        }
+        })
     }
 
     @Mutation(_return => UserMutationResponse)
@@ -175,8 +194,9 @@ export class UserResolver {
     ) : Promise<boolean> {
         const user = await User.findOne({email: forgotPasswordInput.email});
         if(!user) {
-            return true;
+            return false;
         }
+        
         await TokenModel.findOneAndDelete({userId: user.id})
         const resetToken = uuidv4();
         const hashedResetToken = await argon2.hash(resetToken);

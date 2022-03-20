@@ -1,7 +1,7 @@
 import { TutorProfile } from "../entities/TutorProfile";
 import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { TutorProfileMutationResponse } from "../types/TutorProfileMutationResponse";
-import { checkAuthTutor } from "src/middleware/checkAuth";
+import { checkAuthTutor } from "../middleware/checkAuth";
 import { UpdateTFInput } from "../types/UpdateTFInput";
 import { MyContext } from "../types/MyContext";
 import { Tutor } from "../entities/Tutor";
@@ -16,7 +16,7 @@ export class TutorProfileResolver {
         @Arg("updateTutorProfileInput") updateTutorProfileInput: UpdateTFInput,
         @Ctx() {req: {session: {tutorId}}, connection}: MyContext,
     ): Promise<TutorProfileMutationResponse> {
-        const tutor = await connection.getRepository(Tutor).findOne(tutorId);
+        const tutor = await connection.getRepository(Tutor).findOne(tutorId, {relations: ["profile"]});
         if (!tutor) {
             return {
                 code: 401,

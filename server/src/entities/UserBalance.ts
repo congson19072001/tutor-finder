@@ -11,7 +11,7 @@ export class UserBalance {
     id!: string;
 
     @Field(_type => Number)
-    @Column("numeric", { precision: 15, scale: 5 })
+    @Column("numeric", { precision: 15, scale: 5, default: 0 })
     ammount!: number;
 
     @Field(_type => String)
@@ -30,9 +30,9 @@ export class UserBalance {
     @Column({ default: 0 })
     discount!: number;
 
-    @Field(_type => ID)
-    @Column()
-    tutorId!: string;
+    @Field(_type => ID, { nullable: true })
+    @Column({ nullable: true })
+    tutorId: string;
 
     @Field()
     @CreateDateColumn({type: 'timestamptz'})

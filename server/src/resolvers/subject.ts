@@ -11,6 +11,7 @@ import { MyContext } from "../types/MyContext";
 import { UserInputError } from "apollo-server-core";
 import { SubjectTutor } from "../entities/SubjectTutor";
 import { Tutor } from "../entities/Tutor";
+import { Speciality } from "../entities/Speciality";
 
 @Resolver(_of => Subject)
 export class SubjectResolver {
@@ -18,6 +19,19 @@ export class SubjectResolver {
     @FieldResolver(_return => String)
     textSnippet(@Root() root: Subject){
         return root.description.slice(0, 50);
+    }
+
+    @FieldResolver(_return => [Speciality])
+    async specialities(
+        @Root() subject: Subject
+    ) : Promise<Speciality[] | undefined> {
+        try{
+            const specialities = await Speciality.find({where: {subjectId: subject.id}});
+            return specialities;
+        }catch(err){
+            console.log(err);
+            return undefined;
+        }
     }
 
     @FieldResolver(_return => [Tutor])
@@ -34,10 +48,29 @@ export class SubjectResolver {
         @Arg("createSubjectInput") { title, description }: CreateSubjectInput
         ) : Promise<SubjectMutationResponse> {
         try{
+            const existingSubject = await Subject.findOne({
+                where: {
+                    title: title,
+                }
+            });
+            if(existingSubject){
+                return {
+                    code: 400,
+                    success: false,
+                    message: "Subject already exists",
+                    errors: [
+                        {
+                            field: "title",
+                            message: "Subject with this title already exists"
+                        }
+                    ]
+                }
+            }
             const newSubject = Subject.create({
                 title,
                 description,
             });
+
             await newSubject.save();
             return {
                 code: 200,
@@ -161,6 +194,24 @@ export class SubjectResolver {
                     success: false,
                     message: "Subject not found",
                 };
+            }
+            const duplicateSubject = await Subject.findOne({
+                where: {
+                    title: title,
+                }
+            });
+            if(duplicateSubject && duplicateSubject.id !== id){
+                return {
+                    code: 400,
+                    success: false,
+                    message: "Subject with this title already exists",
+                    errors: [
+                        {
+                            field: "title",
+                            message: "Subject with this title already exists"
+                        }
+                    ]
+                }
             }
             existingSubject.title = title;
             existingSubject.description = description;

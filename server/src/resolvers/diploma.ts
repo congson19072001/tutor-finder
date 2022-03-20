@@ -4,7 +4,7 @@ import { Tutor } from "../entities/Tutor";
 import { MyContext } from "../types/MyContext";
 import { checkAuthTutor } from "../middleware/checkAuth";
 import { DiplomaMutationResponse } from "../types/DiplomaMutationResponse";
-import { CreateDiplomaInput } from "src/types/CreateDiplomaInput";
+import { CreateDiplomaInput } from "../types/CreateDiplomaInput";
 
 @Resolver(_of => Diploma)
 export class DiplomaResolver {

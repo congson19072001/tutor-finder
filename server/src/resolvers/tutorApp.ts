@@ -1,11 +1,10 @@
-import { TutorApplication, TutorBookingWindow, TutorGender, TutorNotice } from "../entities/TutorApplication";
+import { TutorApplication } from "../entities/TutorApplication";
 import { Arg,  Ctx,  FieldResolver,  Mutation, Query, Resolver, Root, UseMiddleware } from "type-graphql";
 import argon2 from "argon2";
 import { TutorAppMutationResponse } from "../types/TutorAppMutationResponse";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
 import { LoginInput } from "../types/LoginInput";
 import { MyContext } from "../types/MyContext";
-import { COOKIE_NAME } from "../constants";
 import { checkAuthAdmin, checkAuthTutor } from "../middleware/checkAuth";
 import { TutorRegisterInput } from "../types/TutorRegisterInput";
 import { CertificationApplication } from "../entities/CertificationApplication";
@@ -40,7 +39,7 @@ export class TutorApplicationResolver {
     }
 
     @Query(_return => TutorApplication, {nullable: true})
-    async meTutor(
+    async meTutorApp(
         @Ctx() ctx: MyContext
     ): Promise<TutorApplication| undefined | null> {
         if(!ctx.req.session.tutorId) {
@@ -49,6 +48,19 @@ export class TutorApplicationResolver {
         const tutor = await TutorApplication.findOne(ctx.req.session.tutorId);
         return tutor;
 
+    }
+
+    @Query(_return => [TutorApplication], {nullable: true})
+    @UseMiddleware(checkAuthAdmin)
+    async getAllTutorApplications(
+    ): Promise<TutorApplication[] | undefined> {
+        try {
+            return await TutorApplication.find();
+        
+        }catch(errors){
+            console.log(errors);
+            return undefined;
+        }
     }
 
     @Mutation(_return => TutorAppMutationResponse)
@@ -108,7 +120,7 @@ export class TutorApplicationResolver {
 
     @Mutation(_return => TutorAppMutationResponse)
     @UseMiddleware(checkAuthTutor)
-    async fillTutorApplicaton(
+    async fillTutorApplication(
         @Arg("fillTutorAppInput") fillTutorAppInput: FillTutorApplicationInput,
         @Ctx() ctx: MyContext
     ) : Promise<TutorAppMutationResponse> {
@@ -122,6 +134,7 @@ export class TutorApplicationResolver {
                 }
             }
             const {
+                subjectId,
                 gender,
                 age,
                 address,
@@ -134,21 +147,19 @@ export class TutorApplicationResolver {
                 videoUrl,
                 bookingWindow
             } = fillTutorAppInput;
-            let nGender = gender as TutorGender;
-            let nAdvanceNotice = advanceNotice as TutorNotice;
-            let nBookingWindow = bookingWindow as TutorBookingWindow;
             await TutorApplication.update({id: tutor.id}, {
-                gender: nGender ? nGender : tutor.gender,
+                subjectId : subjectId ? subjectId : tutor.subjectId,
+                gender: gender ? gender : tutor.gender,
                 age: age ? age : tutor.age,
                 address: address ? address : tutor.address,
                 bio: bio ? bio : tutor.bio,
                 country: country ? country : tutor.country,
                 avatar: avatar ? avatar : tutor.avatar,
-                advanceNotice: nAdvanceNotice ? nAdvanceNotice : tutor.advanceNotice,
+                advanceNotice: advanceNotice ? advanceNotice : tutor.advanceNotice,
                 salary: salary ? salary : tutor.salary,
                 timezone: timezone ? timezone : tutor.timezone,
                 videoUrl: videoUrl ? videoUrl : tutor.videoUrl,
-                bookingWindow: nBookingWindow ? nBookingWindow : tutor.bookingWindow
+                bookingWindow: bookingWindow ? bookingWindow : tutor.bookingWindow
             });
             
             return {
@@ -198,15 +209,24 @@ export class TutorApplicationResolver {
                         }]
                     }
                 }
-                if (!tutor.address || !tutor.bio || !tutor.country || !tutor.avatar || !tutor.advanceNotice || !tutor.salary || !tutor.timezone || !tutor.videoUrl || !tutor.bookingWindow || !tutor.subjectId) {
+                let errors = [];
+                let isValid = true; 
+                for (const [key, val] of Object.entries(tutor)) {
+                    if((val === null || val === undefined) && key !== "certificationApplications" && key !== "diplomaApplications" && key !== "availabilityApplications") {
+                        errors.push({
+                            field: key,
+                            message: `${key} is required}`
+                        });
+                        isValid = false;
+                    } 
+                }
+
+                if (!isValid) {
                     return {
                         code: 400,
                         success: false,
                         message: "TutorApplication not filled",
-                        errors: [{
-                            field: "tutorApplication",
-                            message: "TutorApplication not filled"
-                        }]
+                        errors : errors
                     }
                 }
                 await transactionEntityManager.update(TutorApplication, tutor.id, {isValid: true});
@@ -287,7 +307,7 @@ export class TutorApplicationResolver {
 
 
     @Mutation(_return => TutorAppMutationResponse)
-    async loginTutor(
+    async loginTutorApp(
         @Arg('loginInput') loginInput: LoginInput,
         @Ctx() ctx: MyContext
         )
@@ -344,19 +364,5 @@ export class TutorApplicationResolver {
         }
     }
 
-    @Mutation(_return => Boolean)
-    logout(
-        @Ctx() ctx: MyContext
-    ) : Promise<boolean> {
-        return new Promise((resolve, _reject) => {
-            ctx.res.clearCookie(COOKIE_NAME);
-            ctx.req.session.destroy(err => {
-                if(err) {
-                    console.log(err);
-                    resolve(false);
-                }
-                resolve(true);
-            });
-        })
-    }
+    
 }
